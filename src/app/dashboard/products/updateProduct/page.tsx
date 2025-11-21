@@ -281,7 +281,7 @@ interface ProductFormData {
 }
 
 const UpdateProduct = () => {
-  const { register, handleSubmit, reset, setValue, watch } =
+  const { register, handleSubmit,  setValue, watch } =
     useForm<ProductFormData>();
   const [images, setImages] = useState<File[]>([]);
   const [videos, setVideos] = useState<File[]>([]); // ✅ NEW
@@ -363,71 +363,77 @@ const UpdateProduct = () => {
     fetchProduct();
   }, [productId, setValue]);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      setImages(fileArray);
-      setPreviewImages(fileArray.map((file) => URL.createObjectURL(file)));
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setImages((prev) => [...prev, ...files]); // add new images
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setPreviewImages((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setVideos((prev) => [...prev, ...files]); // add new videos
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setPreviewVideos((prev) => [...prev, ...newPreviews]);
+  };
+
+  const deleteImage = (index: number, type: "existing" | "new") => {
+    if (type === "existing") {
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setImages((prev) => prev.filter((_, i) => i !== index));
+      setPreviewImages((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      setVideos(fileArray);
-      setPreviewVideos(fileArray.map((file) => URL.createObjectURL(file)));
+  const deleteVideo = (index: number, type: "existing" | "new") => {
+    if (type === "existing") {
+      setExistingVideos((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setVideos((prev) => prev.filter((_, i) => i !== index));
+      setPreviewVideos((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
-  const onSubmit = async (data: ProductFormData) => {
-    if (!data.categoryId || !data.subCategoryId) {
-      alert("Please select both a category and a subcategory.");
-      return;
-    }
+ const onSubmit = async (data: ProductFormData) => {
+  try {
+    const formData = new FormData();
 
-    try {
-      const formData = new FormData();
-      formData.append("categoryId", data.categoryId);
-      formData.append("subCategoryId", data.subCategoryId);
+    // Keep existing images/videos
+    existingImages.forEach((img) => formData.append("existingImages[]", img));
+    existingVideos.forEach((vid) => formData.append("existingVideos[]", vid));
 
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== "categoryId" && key !== "subCategoryId") {
-          formData.append(key, value);
-        }
-      });
+    // Append newly added images/videos
+    images.forEach((img) => formData.append("images", img));
+    videos.forEach((vid) => formData.append("videos", vid));
 
-      // IMAGES
-      images.forEach((img) => formData.append("images", img));
+    // Append text fields
+    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
 
-      // VIDEOS
-      videos.forEach((vid) => formData.append("videos", vid)); // ✅ NEW
+    const token = localStorage.getItem("token");
 
-      const token = localStorage.getItem("token");
+    await axios.patch(
+      `https://claireapi.onrender.com/product/updateProduct/${productId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      await axios.patch(
-        `https://claireapi.onrender.com/product/updateProduct/${productId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    alert("Product Updated Successfully!");
+    router.push("/dashboard/products");
+  } catch (error) {
+    console.error("Error updating product:", error);
+    alert("Failed to update product.");
+  }
+};
 
-      alert("Product Updated Successfully!");
-      reset();
-      router.push("/dashboard/products");
-    } catch (error) {
-      console.error("Error updating product:", error);
-      alert("Failed to update product.");
-    }
-  };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-6 shadow-lg rounded-lg">
+    <div className="w-full mx-auto bg-white p-6 shadow-lg rounded-lg">
       <div className="flex justify-between">
         <h2 className="text-xl font-bold mb-4">Update Product</h2>
         <Link href="/dashboard/products">
@@ -493,45 +499,93 @@ const UpdateProduct = () => {
         {/* Image Upload */}
         <div>
           <label className="block text-gray-700">Upload Images</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="border p-2 w-full rounded-md"
-          />
-        </div>
+          <input type="file" accept="image/*" multiple onChange={handleImageChange} className="border p-2 w-full rounded-md" />
 
-        {/* Image Previews */}
-        <div className="flex space-x-2 mt-2 flex-wrap">
-          {[...existingImages, ...previewImages].map((img, i) => (
-            <Image
-              key={i}
-              width={1200}
-              height={800}
-              src={img}
-              alt="Preview"
-              className="w-20 h-20 object-cover rounded-md"
-            />
-          ))}
+          <div className="flex flex-wrap mt-2 gap-3">
+
+            {/* Existing Images */}
+            {existingImages.map((img, i) => (
+              <div key={i} className="relative">
+                <Image
+                  src={img}
+                  alt="product image"
+                  width={200}
+                  height={200}
+                  className="rounded-md"
+                />
+                <button
+                  type="button"
+                  onClick={() => deleteImage(i, "existing")}
+                  className="absolute top-1 right-1 bg-red-500 text-white px-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+            {/* New Preview Images */}
+            {previewImages.map((img, i) => (
+              <div key={i} className="relative">
+                <Image
+                  src={img}
+                  alt="product image"
+                  width={200}
+                  height={200}
+                  className="rounded-md"
+                />
+                <button
+                  type="button"
+                  onClick={() => deleteImage(i, "new")}
+                  className="absolute top-1 right-1 bg-red-500 text-white px-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Video Upload */}
         <div>
           <label className="block text-gray-700">Upload Videos</label>
-          <input
-            type="file"
-            multiple
-            accept="video/*"
-            onChange={handleVideoChange}
-            className="border p-2 w-full rounded-md"
-          />
+          <input type="file" accept="video/*" multiple onChange={handleVideoChange} className="border p-2 w-full rounded-md"/>
+
+          <div className="flex flex-wrap mt-2 gap-3">
+
+            {/* Existing Videos */}
+            {existingVideos.map((vid, i) => (
+              <div key={i} className="relative">
+                <video src={vid} controls className="w-32 h-24 rounded"></video>
+
+                <button
+                  type="button"
+                  onClick={() => deleteVideo(i, "existing")}
+                  className="absolute top-1 right-1 bg-red-500 text-white px-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+            {/* New Preview Videos */}
+            {previewVideos.map((vid, i) => (
+              <div key={i} className="relative">
+                <video src={vid} controls className="w-32 h-24 rounded"></video>
+
+                <button
+                  type="button"
+                  onClick={() => deleteVideo(i, "new")}
+                  className="absolute top-1 right-1 bg-red-500 text-white px-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Video Previews */}
-        <div className="flex space-x-3 mt-3 flex-wrap">
-          {/* Existing Videos */}
-          {existingVideos.map((vid, i) => (
+        {/* New Previews */}
+        {/* {previewVideos.map((vid, i) => (
             <video
               key={i}
               src={vid}
@@ -539,17 +593,7 @@ const UpdateProduct = () => {
               controls
             />
           ))}
-
-          {/* New Previews */}
-          {previewVideos.map((vid, i) => (
-            <video
-              key={i}
-              src={vid}
-              className="w-28 h-20 rounded-md"
-              controls
-            />
-          ))}
-        </div>
+        </div> */}
 
         <button
           type="submit"
