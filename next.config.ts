@@ -1,7 +1,15 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'claireapi.onrender.com',
+        pathname: '/images/**'
+      }
+    ],
+    unoptimized: true, // Allow external images without optimization
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
