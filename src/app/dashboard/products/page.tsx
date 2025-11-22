@@ -139,7 +139,7 @@ const Products = () => {
                       </h2>
                       <p className="text-gray-500">{product.description}</p>
                       <p className="text-lg font-bold mt-2">
-                        {product.price?.["10k_yellow_gold"] || 0}
+                        {product.price?.["silver"] || 0}
                       </p>                      <p className="text-sm text-gray-600">
                         {product.categoryId?.categoryName} /{" "}
                         {product.subCategoryId?.subCategoryName}
