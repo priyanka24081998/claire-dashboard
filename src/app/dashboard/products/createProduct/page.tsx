@@ -225,8 +225,21 @@ import { useRouter } from "next/navigation";
 interface ProductFormData {
   name: string;
   description: string;
-  price: string;
-  metal: string;
+"10k_yellow_gold": string;
+  "10k_rose_gold": string;
+  "10k_white_gold": string;
+
+  "14k_yellow_gold": string;
+  "14k_rose_gold": string;
+  "14k_white_gold": string;
+
+  "18k_yellow_gold": string;
+  "18k_rose_gold": string;
+  "18k_white_gold": string;
+
+  silver: string;
+  platinum: string;
+   metal: string;
   diamond: string;
   weight: string;
   subCategoryId: string;
@@ -365,10 +378,36 @@ const CreateProduct = () => {
           <textarea {...register("description", { required: true })} placeholder="Product Description" className="border p-2 w-full rounded-md" />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block font-medium">Price</label>
           <input {...register("price", { required: true })} placeholder="Price" className="border p-2 w-full rounded-md" />
+        </div> */}
+
+        {/* METAL-WISE PRICE FIELDS */}
+        <h3 className="text-lg font-semibold mt-4">Pricing</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          {/* 10K */}
+          <input {...register("10k_yellow_gold")} placeholder="10k Yellow Gold Price" className="border p-2 rounded-md" />
+          <input {...register("10k_rose_gold")} placeholder="10k Rose Gold Price" className="border p-2 rounded-md" />
+          <input {...register("10k_white_gold")} placeholder="10k White Gold Price" className="border p-2 rounded-md" />
+
+          {/* 14K */}
+          <input {...register("14k_yellow_gold")} placeholder="14k Yellow Gold Price" className="border p-2 rounded-md" />
+          <input {...register("14k_rose_gold")} placeholder="14k Rose Gold Price" className="border p-2 rounded-md" />
+          <input {...register("14k_white_gold")} placeholder="14k White Gold Price" className="border p-2 rounded-md" />
+
+          {/* 18K */}
+          <input {...register("18k_yellow_gold")} placeholder="18k Yellow Gold Price" className="border p-2 rounded-md" />
+          <input {...register("18k_rose_gold")} placeholder="18k Rose Gold Price" className="border p-2 rounded-md" />
+          <input {...register("18k_white_gold")} placeholder="18k White Gold Price" className="border p-2 rounded-md" />
+
+          {/* SILVER & PLATINUM */}
+          <input {...register("silver")} placeholder="Silver Price" className="border p-2 rounded-md" />
+          <input {...register("platinum")} placeholder="Platinum Price" className="border p-2 rounded-md" />
         </div>
+
 
         <div>
           <label className="block font-medium">Metal Type</label>
