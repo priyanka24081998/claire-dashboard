@@ -270,7 +270,20 @@ import Link from "next/link";
 interface ProductFormData {
   name: string;
   description: string;
-  price: string;
+  "10k_yellow_gold": string;
+  "10k_rose_gold": string;
+  "10k_white_gold": string;
+
+  "14k_yellow_gold": string;
+  "14k_rose_gold": string;
+  "14k_white_gold": string;
+
+  "18k_yellow_gold": string;
+  "18k_rose_gold": string;
+  "18k_white_gold": string;
+
+  silver: string;
+  platinum: string;
   metal: string;
   diamond: string;
   weight: string;
@@ -281,7 +294,7 @@ interface ProductFormData {
 }
 
 const UpdateProduct = () => {
-  const { register, handleSubmit,  setValue, watch } =
+  const { register, handleSubmit, setValue, watch } =
     useForm<ProductFormData>();
   const [images, setImages] = useState<File[]>([]);
   const [videos, setVideos] = useState<File[]>([]); // ✅ NEW
@@ -344,7 +357,6 @@ const UpdateProduct = () => {
 
         setValue("name", product.name || "");
         setValue("description", product.description || "");
-        setValue("price", product.price || "");
         setValue("metal", product.metal || "");
         setValue("diamond", product.diamond || "");
         setValue("weight", product.weight || "");
@@ -355,6 +367,13 @@ const UpdateProduct = () => {
 
         setExistingImages(product.images || []);
         setExistingVideos(product.videos || []); // ✅ NEW
+
+        if (product.price) {
+          Object.keys(product.price).forEach((key) => {
+            setValue(key as keyof ProductFormData, product.price[key] || "");
+          });
+        }
+
       } catch (error) {
         console.error("❌ Error fetching product:", error);
       }
@@ -395,41 +414,45 @@ const UpdateProduct = () => {
     }
   };
 
- const onSubmit = async (data: ProductFormData) => {
-  try {
-    const formData = new FormData();
+  const onSubmit = async (data: ProductFormData) => {
+    try {
+      const formData = new FormData();
 
-    // Keep existing images/videos
-    existingImages.forEach((img) => formData.append("existingImages[]", img));
-    existingVideos.forEach((vid) => formData.append("existingVideos[]", vid));
+      // Keep existing images/videos
+      existingImages.forEach((img) => formData.append("existingImages[]", img));
+      existingVideos.forEach((vid) => formData.append("existingVideos[]", vid));
 
-    // Append newly added images/videos
-    images.forEach((img) => formData.append("images", img));
-    videos.forEach((vid) => formData.append("videos", vid));
+      // Append newly added images/videos
+      images.forEach((img) => formData.append("images", img));
+      videos.forEach((vid) => formData.append("videos", vid));
 
-    // Append text fields
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+      // Append text fields
+      // Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formData.append(key, value.toString());
+        }
+      });
+      const token = localStorage.getItem("token");
 
-    const token = localStorage.getItem("token");
+      await axios.patch(
+        `https://claireapi.onrender.com/product/updateProduct/${productId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    await axios.patch(
-      `https://claireapi.onrender.com/product/updateProduct/${productId}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    alert("Product Updated Successfully!");
-    router.push("/dashboard/products");
-  } catch (error) {
-    console.error("Error updating product:", error);
-    alert("Failed to update product.");
-  }
-};
+      alert("Product Updated Successfully!");
+      router.push("/dashboard/products");
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("Failed to update product.");
+    }
+  };
 
 
   return (
@@ -447,7 +470,20 @@ const UpdateProduct = () => {
         {[
           ["name", "Product Name"],
           ["description", "Product Description"],
-          ["price", "Price"],
+          ["10k_yellow_gold", "10K Yellow Gold"],
+          ["10k_rose_gold", "10K Rose Gold"],
+          ["10k_white_gold", "10K White Gold"],
+
+          ["14k_yellow_gold", "14K Yellow Gold"],
+          ["14k_rose_gold", "14K Rose Gold"],
+          ["14k_white_gold", "14K White Gold"],
+
+          ["18k_yellow_gold", "18K Yellow Gold"],
+          ["18k_rose_gold", "18K Rose Gold"],
+          ["18k_white_gold", "18K White Gold"],
+
+          ["silver", "Silver"],
+          ["platinum", "Platinum"],
           ["metal", "Metal Type"],
           ["diamond", "Diamond Type"],
           ["weight", "Weight"],
@@ -548,7 +584,7 @@ const UpdateProduct = () => {
         {/* Video Upload */}
         <div>
           <label className="block text-gray-700">Upload Videos</label>
-          <input type="file" accept="video/*" multiple onChange={handleVideoChange} className="border p-2 w-full rounded-md"/>
+          <input type="file" accept="video/*" multiple onChange={handleVideoChange} className="border p-2 w-full rounded-md" />
 
           <div className="flex flex-wrap mt-2 gap-3">
 

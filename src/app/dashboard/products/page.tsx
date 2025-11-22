@@ -10,7 +10,22 @@ interface Product {
   _id: string;
   name: string;
   description: string;
-  price: string;
+  price?: {
+    "10k_yellow_gold"?: number;
+    "10k_rose_gold"?: number;
+    "10k_white_gold"?: number;
+
+    "14k_yellow_gold"?: number;
+    "14k_rose_gold"?: number;
+    "14k_white_gold"?: number;
+
+    "18k_yellow_gold"?: number;
+    "18k_rose_gold"?: number;
+    "18k_white_gold"?: number;
+
+    silver?: number;
+    platinum?: number;
+  };
   metal?: string;
   diamond?: string;
   weight?: string;
@@ -105,12 +120,12 @@ const Products = () => {
               {/* ✅ Product Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                 {Array.isArray(products) && products.length > 0 ? (
-                  products.map((product,index) => (
+                  products.map((product, index) => (
                     <div
                       key={product._id}
                       className="bg-white shadow-lg p-4 rounded-lg"
-                    > 
-                    <h4>{index + 1}</h4>
+                    >
+                      <h4>{index + 1}</h4>
                       <Image
                         src={product.images[0]}
                         alt={product.name}
@@ -123,15 +138,16 @@ const Products = () => {
                         {product.name}
                       </h2>
                       <p className="text-gray-500">{product.description}</p>
-                      <p className="text-lg font-bold mt-2">${product.price}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-lg font-bold mt-2">
+                        {product.price?.["10k_yellow_gold"] || 0}
+                      </p>                      <p className="text-sm text-gray-600">
                         {product.categoryId?.categoryName} /{" "}
                         {product.subCategoryId?.subCategoryName}
                       </p>
 
                       <div className="mt-4 flex gap-2">
-                      <Link href={`/dashboard/products/updateProduct?id=${product._id}`}>
-                      <button className="bg-[#43825c] text-white px-6 py-2 rounded-md hover:bg-[#366b4d]">
+                        <Link href={`/dashboard/products/updateProduct?id=${product._id}`}>
+                          <button className="bg-[#43825c] text-white px-6 py-2 rounded-md hover:bg-[#366b4d]">
                             Edit
                           </button>
                         </Link>

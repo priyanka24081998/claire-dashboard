@@ -225,7 +225,7 @@ import { useRouter } from "next/navigation";
 interface ProductFormData {
   name: string;
   description: string;
-"10k_yellow_gold": string;
+  "10k_yellow_gold": string;
   "10k_rose_gold": string;
   "10k_white_gold": string;
 
@@ -389,23 +389,59 @@ const CreateProduct = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
           {/* 10K */}
+          <div>
+            <label className="block font-medium">10k Yellow Gold Price</label>
           <input {...register("10k_yellow_gold")} placeholder="10k Yellow Gold Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+          <label className="block font-medium">10k Rose Gold Price</label>
           <input {...register("10k_rose_gold")} placeholder="10k Rose Gold Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+            <label className="block font-medium">10k White Gold Price</label>
           <input {...register("10k_white_gold")} placeholder="10k White Gold Price" className="border p-2 rounded-md" />
+          </div>
 
           {/* 14K */}
+          <div>
+          <label className="block font-medium">14k Yellow Gold Price</label>
           <input {...register("14k_yellow_gold")} placeholder="14k Yellow Gold Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+          <label className="block font-medium">14k Rose Gold Price</label>
           <input {...register("14k_rose_gold")} placeholder="14k Rose Gold Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+          <label className="block font-medium">14k White Gold Price</label>
           <input {...register("14k_white_gold")} placeholder="14k White Gold Price" className="border p-2 rounded-md" />
+          </div>
+
 
           {/* 18K */}
+          <div>
+          <label className="block font-medium">18k Yellow Gold Price</label>
           <input {...register("18k_yellow_gold")} placeholder="18k Yellow Gold Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+          <label className="block font-medium">18k Rose Gold Price</label>
           <input {...register("18k_rose_gold")} placeholder="18k Rose Gold Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+          <label className="block font-medium">18k White Gold Price</label>
           <input {...register("18k_white_gold")} placeholder="18k White Gold Price" className="border p-2 rounded-md" />
+          </div>
+
 
           {/* SILVER & PLATINUM */}
+          <div>
+          <label className="block font-medium">Silver Price</label>
           <input {...register("silver")} placeholder="Silver Price" className="border p-2 rounded-md" />
+          </div>
+          <div>
+          <label className="block font-medium">Platinum Price</label>
           <input {...register("platinum")} placeholder="Platinum Price" className="border p-2 rounded-md" />
+          </div>
+
         </div>
 
 
@@ -415,8 +451,8 @@ const CreateProduct = () => {
         </div>
 
         <div>
-          <label className="block font-medium">Diamond Size</label>
-          <input {...register("diamond", { required: true })} placeholder="Diamond Size" className="border p-2 w-full rounded-md" />
+          <label className="block font-medium">Diamond type</label>
+          <input {...register("diamond", { required: true })} placeholder="Diamond type" className="border p-2 w-full rounded-md" />
         </div>
 
         <div>
